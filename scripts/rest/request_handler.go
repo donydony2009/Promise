@@ -25,8 +25,12 @@ func NewRequestHandler(handlerFunction RequestHandlerFunc) RequestHandler {
 }
 
 func (rh RequestHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	userID, _ := rh.Authenticate(r)
-	err := rh.handlerInternal(userID, w, r)
+	userID, err := rh.Authenticate(r)
+	if err != nil {
+		rh.HandleError(w, err)
+		return
+	}
+	err = rh.handlerInternal(userID, w, r)
 	rh.HandleError(w, err)
 }
 
