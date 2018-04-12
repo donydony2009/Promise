@@ -24,7 +24,7 @@ func CreateConnection() *MySQL {
 	connGlobal, _ := sql.Open("mysql", "root:root@/")
 	connGlobal.Exec("CREATE DATABASE IF NOT EXISTS " + mySQL.schema + ";")
 	connGlobal.Close()
-	conn, _ := sql.Open("mysql", "root:root@172.17.0.2:3306/"+mySQL.schema+"?parseTime=true")
+	conn, _ := sql.Open("mysql", "root:root@tcp(172.17.0.2:3306)/"+mySQL.schema+"?parseTime=true")
 	mySQL.Conn = conn
 
 	return &mySQL
