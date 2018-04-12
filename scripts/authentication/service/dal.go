@@ -1,7 +1,7 @@
 package authentication
 import (
 	"github.com/satori/go.uuid"
-	"mysql"
+	"github.com/donydony2009/Promise/scripts/mysql"
 	"encoding/hex"
 	"time"
 	"database/sql"
