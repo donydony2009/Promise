@@ -1,5 +1,5 @@
-
-FOR /F "tokens=* USEBACKQ" %%F IN (`docker run --name nginx-reverse-proxy -v nginx.conf:/etc/nginx/nginx.conf:ro -p 80:80 -d nginx`) DO (
-SET container=%%F
-)
-echo %container%
+docker rm -f nginx-reverse-proxy
+docker run --name nginx-reverse-proxy --link promise-promise --link promise-authentication -p 80:80 -d nginx
+docker cp nginx.conf nginx-reverse-proxy:/etc/nginx/nginx.conf 
+docker stop nginx-reverse-proxy
+docker start nginx-reverse-proxy -a

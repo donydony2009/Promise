@@ -35,6 +35,7 @@ func (f *RestHandler) StartListening(port int) {
 	router := mux.NewRouter().StrictSlash(true)
 	router.HandleFunc("/promise", requestHandlerFactory.New(f.AddPromise).ServeHTTP).Methods("POST")
 	router.HandleFunc("/promise/{id:[0-9]+}", requestHandlerFactory.New(f.PromiseInteract).ServeHTTP).Methods("GET", "PUT", "DELETE")
+	router.HandleFunc("/promise/list", requestHandlerFactory.New(f.ListPromises).ServeHTTP).Methods("GET")
 
 	log.Fatal(http.ListenAndServe(":"+strconv.Itoa(port), router))
 }
@@ -93,6 +94,16 @@ func (f *RestHandler) DeletePromise(userID uuid.UUID, w http.ResponseWriter, r *
 		return promises.InvalidUserError{}
 	}
 	f.service.DeletePromise(promise.PromiseId)
+	w.Write(jsonBody)
+	return nil
+}
+
+func (f *RestHandler) ListPromises(userID uuid.UUID, w http.ResponseWriter, r *http.Request) error {
+	promises := f.service.GetPromises(userID)
+	jsonBody, err := json.Marshal(promises)
+	if err != nil {
+		return err
+	}
 	w.Write(jsonBody)
 	return nil
 }
