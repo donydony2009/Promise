@@ -1,6 +1,6 @@
 package main
 
-type PromiseAdd struct{
-	Title string `json:"title"`
+type PromiseAdd struct {
+	Title       string `json:"title"`
 	Description string `json:"description"`
 }

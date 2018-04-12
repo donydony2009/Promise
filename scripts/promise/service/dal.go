@@ -1,45 +1,46 @@
 package promises
+
 import (
-	"strconv"
-	"github.com/satori/go.uuid"
-	"mysql"
 	"encoding/hex"
+	"strconv"
+
+	"github.com/donydony2009/Promise/scripts/mysql"
+	"github.com/satori/go.uuid"
 )
 
 type Dal struct {
-	mySQL *mysql.MySQL
+	mySQL          *mysql.MySQL
 	versionManager *mysql.VersionManager
 }
 
-func CreateDal(serviceName string) *Dal{
+func CreateDal(serviceName string) *Dal {
 	dal := new(Dal)
 	dal.mySQL = mysql.CreateConnection()
 	dal.versionManager = mysql.CreateVersionManager(dal.mySQL, serviceName)
 	dal.addDBVersions()
 	dal.versionManager.UpgradeToLatest()
-	
+
 	return dal
 }
 
-func (f *Dal) addDBVersions(){
+func (f *Dal) addDBVersions() {
 	var v1 mysql.DBVersion
 	v1.Upgrade = SQLUpgradeV1
 	v1.Downgrade = SQLDowngradeV1
 	f.versionManager.AddVersion(v1)
 }
 
-func (f *Dal) fromUUIDToHex(id uuid.UUID) string{
+func (f *Dal) fromUUIDToHex(id uuid.UUID) string {
 	return hex.EncodeToString(id.Bytes())
 }
 
-
-func (f *Dal) AddPromise(user_id uuid.UUID, title string, description string ){
+func (f *Dal) AddPromise(user_id uuid.UUID, title string, description string) {
 	hexUserId := f.fromUUIDToHex(user_id)
 	f.mySQL.Conn.Exec("INSERT INTO promises(user_id, title, description)" +
 		" VALUES(X'" + hexUserId + "','" + title + "','" + description + "')")
 }
 
-func (f *Dal) EditPromise(promiseId int, title string, description string, promisedTo uuid.UUID, status Status, privacy Privacy){
+func (f *Dal) EditPromise(promiseId int, title string, description string, promisedTo uuid.UUID, status Status, privacy Privacy) {
 	hexPromisedTo := f.fromUUIDToHex(promisedTo)
 	f.mySQL.Conn.Exec("UPDATE promises SET " +
 		"title = '" + title + "'," +
@@ -50,11 +51,11 @@ func (f *Dal) EditPromise(promiseId int, title string, description string, promi
 		" WHERE promise_id = " + strconv.Itoa(promiseId))
 }
 
-func (f *Dal) DeletePromise(promiseId int){
+func (f *Dal) DeletePromise(promiseId int) {
 	f.mySQL.Conn.Exec("DELETE FROM promises WHERE promise_id = " + strconv.Itoa(promiseId))
 }
 
-func (f *Dal) GetPromises(user_id uuid.UUID) []LEPromise{
+func (f *Dal) GetPromises(user_id uuid.UUID) []LEPromise {
 	var results []LEPromise
 	hexId := f.fromUUIDToHex(user_id)
 	rows, _ := f.mySQL.Conn.Query("SELECT * FROM promises WHERE user_id = X'" + hexId + "'")
@@ -72,7 +73,7 @@ func (f *Dal) GetPromises(user_id uuid.UUID) []LEPromise{
 	return results
 }
 
-func (f *Dal) GetPromise(promiseId int) LEPromise{
+func (f *Dal) GetPromise(promiseId int) LEPromise {
 	row := f.mySQL.Conn.QueryRow("SELECT * FROM promises WHERE promise_id = " + strconv.Itoa(promiseId))
 	var result LEPromise
 	var userId []byte
@@ -80,12 +81,9 @@ func (f *Dal) GetPromise(promiseId int) LEPromise{
 	row.Scan(&result.PromiseId, &result.Title, &result.Description, &userId, &promisedTo, &result.Status, &result.Privacy)
 	result.UserId, _ = uuid.FromBytes(userId)
 	result.PromisedTo = uuid.FromBytesOrNil(promisedTo)
-	return result 
+	return result
 }
 
-func (f *Dal) CloseConnection(){
+func (f *Dal) CloseConnection() {
 	f.mySQL.Close()
 }
-	
-
-

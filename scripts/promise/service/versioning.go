@@ -1,9 +1,10 @@
 package promises
+
 import (
-	"mysql"
+	"github.com/donydony2009/Promise/scripts/mysql"
 )
 
-func SQLUpgradeV1(mySql *mysql.MySQL) error{
+func SQLUpgradeV1(mySql *mysql.MySQL) error {
 	_, err := mySql.Conn.Exec("CREATE TABLE `promises` (" +
 		"`promise_id` INT NOT NULL AUTO_INCREMENT," +
 		"`title` VARCHAR(50) NOT NULL," +
@@ -15,12 +16,12 @@ func SQLUpgradeV1(mySql *mysql.MySQL) error{
 		"INDEX `user_id` (`user_id`)," +
 		"INDEX `promised_to` (`promised_to`)," +
 		"PRIMARY KEY (`promise_id`)" +
-	")" +
-	"ENGINE=InnoDB;")
+		")" +
+		"ENGINE=InnoDB;")
 	return err
 }
 
-func SQLDowngradeV1(mySql *mysql.MySQL) error{
+func SQLDowngradeV1(mySql *mysql.MySQL) error {
 	_, err := mySql.Conn.Exec("DROP TABLE `promises`")
 	return err
 }
