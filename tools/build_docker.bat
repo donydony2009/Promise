@@ -1,7 +1,3 @@
-
+SET SCRIPTS_PATH=..\scripts
 SET SERVICE=%1
-rmdir /S /Q docker
-mkdir docker
-xcopy src\%SERVICE% docker /E
-xcopy src\mysql docker /E
-xcopy src\rest docker /E
+docker build %SCRIPTS_PATH%\%SERVICE% -t %SERVICE%:1.0

@@ -12,7 +12,7 @@ import "fmt"
 
 //MySQL ...
 type MySQL struct {
-	Conn *sql.DB
+	Conn   *sql.DB
 	schema string
 }
 
@@ -24,7 +24,7 @@ func CreateConnection() *MySQL {
 	connGlobal, _ := sql.Open("mysql", "root:root@/")
 	connGlobal.Exec("CREATE DATABASE IF NOT EXISTS " + mySQL.schema + ";")
 	connGlobal.Close()
-	conn, _ := sql.Open("mysql", "root:root@/" + mySQL.schema + "?parseTime=true")
+	conn, _ := sql.Open("mysql", "root:root@172.17.0.2:3306/"+mySQL.schema+"?parseTime=true")
 	mySQL.Conn = conn
 
 	return &mySQL
@@ -37,12 +37,12 @@ func (f MySQL) Close() {
 }
 
 //DoesTableExist ...
-func (f MySQL) DoesTableExist(name string) bool{
+func (f MySQL) DoesTableExist(name string) bool {
 	var count int
 	row := f.Conn.QueryRow(
-        `SELECT count(*) 
+		`SELECT count(*) 
         FROM information_schema.tables
-        WHERE table_schema = '`+ f.schema + `'
+        WHERE table_schema = '` + f.schema + `'
         AND table_name = '` + name + `'
         LIMIT 1;`)
 	row.Scan(&count)
