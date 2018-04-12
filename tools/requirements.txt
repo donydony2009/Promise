@@ -1,2 +1,4 @@
 github.com/satori/go.uuid
 github.com/gorilla/mux
+github.com/donydony2009/Promise/scripts/mysql
+github.com/donydony2009/Promise/scripts/rest
